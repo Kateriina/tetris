@@ -33,16 +33,43 @@ public enum Figure {
 
 
 
-    private List<Coordinates> dot;
+    public final List<Coordinates> dots;
+
+    public final Coordinates top;
+    public final Coordinates bot;
 
     Figure(int ... coords){
-        dot = new ArrayList<Coordinates>();
+        dots = new ArrayList<Coordinates>();
         for ( int j = 0; j < coords.length; j+=2){
-            dot.add(new Coordinates(coords[j], coords[j+1]));
+            dots.add(new Coordinates(coords[j], coords[j+1]));
         }
+        top = setTop();
+        bot = setBottom();
     }
 
-    public Figure turnLeft(){
+    //Определение координат верхнего угла.
+    //Для того, чтобы определить, можно ли двигать фигуру влево, направо, вниз или вправо.
+    //Понять, упирается она во что-либо или нет.
+    private Coordinates setTop(){
+        int x = dots.get(0).x;
+        int y = dots.get(0).y;
+        for (Coordinates coord : dots){
+            if(x > coord.x) x = coord.x;
+            if(y > coord.y) y = coord.y;
+        }
+        return new Coordinates(x, y);
+    }
+
+    private Coordinates setBottom(){
+        int x = dots.get(0).x;
+        int y = dots.get(0).y;
+        for (Coordinates coord : dots){
+            if(x < coord.x) x = coord.x;
+            if(y < coord.y) y = coord.y;
+        }
+        return new Coordinates(x, y);
+    }
+    public Figure turnRight(){
         switch (this){
             case I1 : return I2;
             case I2 : return I1;
@@ -73,8 +100,11 @@ public enum Figure {
         }
     }
 
-
-    public Figure turnRight(){
+    public Figure turnLeft(){
         return  turnRight().turnRight().turnRight();
     }
+    public static Figure getRandom(){
+        return Figure.values()[(int)(Math.random()*Figure.values().length)];
+    }
+
 }
