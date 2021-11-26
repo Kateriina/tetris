@@ -104,7 +104,16 @@ public enum Figure {
         return  turnRight().turnRight().turnRight();
     }
     public static Figure getRandom(){
-        return Figure.values()[(int)(Math.random()*Figure.values().length)];
+        switch((int)Math.random() * 7){
+            case 0: return I1;
+            case 1: return J1;
+            case 2: return L1;
+            case 3: return O;
+            case 4: return S1;
+            case 5: return T1;
+            case 6:
+            default:return Z1;
+        }
     }
 
 }
