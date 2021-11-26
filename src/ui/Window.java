@@ -75,17 +75,32 @@ public class Window extends JFrame implements Runnable{
        boxes[x][y].setBorder(BorderFactory.createLineBorder(Color.BLACK, thick));
     }
 
-    private boolean canMoveFigure(int sx, int sy){
-        int left = coord.x + sx + figure.top.x;
-        if (left < 0) return false;
-        int right = coord.x + sx + figure.bot.x;
-        if ( right>= Config.WIDTH) return false;
+    //разрешение на движение вправо/влево
+    private boolean canMoveFigure(Figure figure, int sx, int sy){
+        if (coord.x + sx + figure.top.x < 0) return false;
+        if (coord.x + sx + figure.bot.x >= Config.WIDTH) return false;
+        if (coord.y + sy + figure.top.y < 0) return false;
+        if (coord.y + sy + figure.bot.y >= Config.HEIGHT) return false;
         return true;
     }
 
     private void moveFigure(int sx, int sy){
-        if (canMoveFigure(sx, sy))
+        if (canMoveFigure(figure, sx, sy))
             coord = coord.plus(sx, sy);
+    }
+    private void turnFigure(){
+        Figure rotated = figure.turnRight();
+        if (canMoveFigure(rotated,0,0)){
+            figure = rotated;
+        }
+       else if (canMoveFigure(rotated,1,0)) {
+            figure = rotated;
+            moveFigure(1,0);
+        }
+       else if (canMoveFigure(rotated,-1,0)) {
+            figure = rotated;
+            moveFigure(-1,0);
+        }
     }
 
     class KeyAdapter implements KeyListener{
@@ -98,6 +113,8 @@ public class Window extends JFrame implements Runnable{
             switch (e.getKeyCode()){
                 case KeyEvent.VK_LEFT : moveFigure(-1, 0); break;
                 case KeyEvent.VK_RIGHT : moveFigure(+1 ,0); break;
+                case KeyEvent.VK_DOWN: moveFigure(0,+1); break;
+                case KeyEvent.VK_UP: turnFigure(); break;
             }
             showFigure();
         }
