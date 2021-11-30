@@ -28,7 +28,13 @@ public class Window extends JFrame implements Runnable, Mapable {
     }
     public void addFigure(){
         fly = new FlyFigure(this);
-        showFigure();
+        if(fly.canPlaceFigure()){
+            showFigure();
+        }
+        else{
+            setVisible(false);
+            dispose();
+        }
     }
 
     public void initForm(){
@@ -115,8 +121,8 @@ public class Window extends JFrame implements Runnable, Mapable {
                 case KeyEvent.VK_LEFT : moveFly(-1, 0); break;
                 case KeyEvent.VK_RIGHT : moveFly(+1 ,0); break;
 
-                case KeyEvent.VK_UP: turnFly(1); break;
-                case KeyEvent.VK_DOWN: turnFly(2); break;
+                case KeyEvent.VK_UP: turnFly(2); break;
+                //case KeyEvent.VK_DOWN: turnFly(1); break;
             }
             showFigure();
         }
@@ -126,7 +132,7 @@ public class Window extends JFrame implements Runnable, Mapable {
     }
 
     private  void removeLines(){
-        for (int y = Config.HEIGHT - 1; y >=0; y--){
+        for (int y = Config.HEIGHT - 1; y >= 0; y--){
             while(isFullLine(y)){
                 dropLine(y);
             }
@@ -136,7 +142,7 @@ public class Window extends JFrame implements Runnable, Mapable {
     private void dropLine(int y){
         for(int movey=y-1; movey >= 0; movey--){
             for(int x = 0; x < Config.HEIGHT; x++){
-                setBoxColor(x, movey, getBoxColor(x, movey  + 1 ), getBoxThick(x, movey));
+                setBoxColor(x, movey + 1, getBoxColor(x, movey), getBoxThick(x, movey));
             }
         }
         for(int x = 0; x < Config.WIDTH; x++){
