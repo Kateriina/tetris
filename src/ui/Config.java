@@ -8,7 +8,11 @@ public class Config {
     public static final int HEIGHT = 20;
 
     public static final int SIZE = 30;
-    public static final Color BACK = Color.lightGray;
-    public static final Color FORE = Color.GREEN;
+    public static final Color[] COLORS = {
+            Color.lightGray,
+            Color.GREEN,
+            Color.GRAY
+    };
+
 
 }

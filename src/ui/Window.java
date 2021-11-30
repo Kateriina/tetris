@@ -2,14 +2,17 @@ package ui;
 
 import model.Coordinates;
 import model.Figure;
+import model.Mapable;
 import service.FlyFigure;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Window extends JFrame implements Runnable{
+public class Window extends JFrame implements Runnable, Mapable {
 
     private Box[][] boxes;
     private FlyFigure fly;
@@ -19,9 +22,12 @@ public class Window extends JFrame implements Runnable{
         initForm();
         initBoxes();
         addKeyListener(new KeyAdapter());
+        TimeAdapter timeAdapter = new TimeAdapter();
+        Timer timer = new Timer(100, timeAdapter);
+        timer.start();
     }
     public void addFigure(){
-        fly = new FlyFigure();
+        fly = new FlyFigure(this);
         showFigure();
     }
 
@@ -71,11 +77,32 @@ public class Window extends JFrame implements Runnable{
        if ( x < 0 || x >= Config.WIDTH) return;
        if ( y < 0 || y >= Config.HEIGHT) return;
 
-       boxes[x][y].setColor(color);
+       boxes[x][y].setColor(color, thick);
        boxes[x][y].setBorder(BorderFactory.createLineBorder(Color.BLACK, thick));
     }
 
+    public int getBoxColor(int x, int y){
+        if ( x < 0 || x >= Config.WIDTH) return -1;
+        if ( y < 0 || y >= Config.HEIGHT) return -1;
+        return boxes[x][y].getColor();
+    }
 
+    public int getBoxThick(int x, int y){
+        if ( x < 0 || x >= Config.WIDTH) return -1;
+        if ( y < 0 || y >= Config.HEIGHT) return -1;
+        return boxes[x][y].getThick();
+    }
+    private void moveFly(int sx, int sy){
+        hideFigure();
+        fly.moveFigure(sx, sy);
+        showFigure();
+    }
+
+    private void turnFly(int direction){
+        hideFigure();
+        fly.turnFigure(direction);
+        showFigure();
+    }
 
     class KeyAdapter implements KeyListener{
         @Override
@@ -85,15 +112,55 @@ public class Window extends JFrame implements Runnable{
         public void keyPressed(KeyEvent e) {
             hideFigure();
             switch (e.getKeyCode()){
-                case KeyEvent.VK_LEFT : fly.moveFigure(-1, 0); break;
-                case KeyEvent.VK_RIGHT : fly.moveFigure(+1 ,0); break;
-                case KeyEvent.VK_DOWN: fly.moveFigure(0,+1); break;
-                case KeyEvent.VK_UP: fly.turnFigure(); break;
+                case KeyEvent.VK_LEFT : moveFly(-1, 0); break;
+                case KeyEvent.VK_RIGHT : moveFly(+1 ,0); break;
+
+                case KeyEvent.VK_UP: turnFly(1); break;
+                case KeyEvent.VK_DOWN: turnFly(2); break;
             }
             showFigure();
         }
 
         @Override
         public void keyReleased(KeyEvent e) {}
+    }
+
+    private  void removeLines(){
+        for (int y = Config.HEIGHT - 1; y >=0; y--){
+            while(isFullLine(y)){
+                dropLine(y);
+            }
+        }
+    }
+
+    private void dropLine(int y){
+        for(int movey=y-1; movey >= 0; movey--){
+            for(int x = 0; x < Config.HEIGHT; x++){
+                setBoxColor(x, movey, getBoxColor(x, movey  + 1 ), getBoxThick(x, movey));
+            }
+        }
+        for(int x = 0; x < Config.WIDTH; x++){
+            setBoxColor(x, 0, 0, 0);
+        }
+    }
+
+    private boolean isFullLine(int y){
+        for(int x = 0; x < Config.WIDTH; x++){
+            if(getBoxColor(x, y) != 2)
+                return false;
+        }
+        return true;
+    }
+    class TimeAdapter implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            moveFly(0,1);
+            if (fly.isLanded()){
+                showFigure(2,1);
+                removeLines();
+                addFigure();
+            }
+        }
     }
 }

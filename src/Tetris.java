@@ -11,3 +11,4 @@ public class Tetris {
         window.addFigure();
     }
 }
+
