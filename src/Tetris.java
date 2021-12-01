@@ -1,6 +1,3 @@
-import model.Coordinates;
-import model.Figure;
-import ui.Info;
 import ui.Window;
 
 import javax.swing.*;
