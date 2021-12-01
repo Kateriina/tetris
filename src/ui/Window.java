@@ -16,14 +16,30 @@ public class Window extends JFrame implements Runnable, Mapable {
 
     private Box[][] boxes;
     private FlyFigure fly;
+    private JLabel statusBar;
 
+    private int count = 0;
+    private JLabel status;
+    private Timer timer;
+
+    JLabel getStatusBar() {
+        return statusBar;
+    }
     public Window() {
         boxes = new Box[Config.WIDTH][Config.HEIGHT];
+        count = 0;
         initForm();
         initBoxes();
+        setLayout(new BorderLayout());
+
+        status = new JLabel("");
+        setStatusText("0");
+        //JLabel status = new JLabel();
+        //status.setText("Score: "+ score);
+        add(status, BorderLayout.SOUTH);
         addKeyListener(new KeyAdapter());
         TimeAdapter timeAdapter = new TimeAdapter();
-        Timer timer = new Timer(100, timeAdapter);
+        timer = new Timer(100, timeAdapter);
         timer.start();
     }
     public void addFigure(){
@@ -32,20 +48,28 @@ public class Window extends JFrame implements Runnable, Mapable {
             showFigure();
         }
         else{
-            setVisible(false);
-            dispose();
+            setStatusText(String.valueOf(count) + ". Игра окончена!");
+            timer.stop();
+            //setVisible(false);
+            //dispose();
         }
     }
 
     public void initForm(){
+
+        Image icon = new javax.swing.ImageIcon("images/tetris.png").getImage();
+        setIconImage(icon);
+
         setSize(Config.WIDTH * Config.SIZE + 15,
-                Config.HEIGHT * Config.SIZE + 30); // размер формы
+                Config.HEIGHT * Config.SIZE + 65); // размер формы
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
 
         setTitle("Игра Тетрис");
         setLocationRelativeTo(null);
         setLayout(null);
+
         setVisible(true);
         setResizable(false);
     }
@@ -59,18 +83,19 @@ public class Window extends JFrame implements Runnable, Mapable {
         }
     }
 
+    public void setStatusText(String sc) {
+        status.setText("Счет: " + sc);
+    }
     @Override
     public void run() {
         repaint();
     }
     private void showFigure(){
-
         showFigure( 1, 1);
     }
 
     private void hideFigure(){
         showFigure(0, 0);
-
     }
 
     private void showFigure(int color, int thick){
@@ -132,10 +157,17 @@ public class Window extends JFrame implements Runnable, Mapable {
     }
 
     private  void removeLines(){
+        int countLines = 0;
         for (int y = Config.HEIGHT - 1; y >= 0; y--){
             while(isFullLine(y)){
+                ++countLines;
                 dropLine(y);
             }
+        }
+
+        if(countLines > 0){
+            count+=countLines;
+            setStatusText(String.valueOf(count));
         }
     }
 

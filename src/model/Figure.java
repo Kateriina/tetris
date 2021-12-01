@@ -104,7 +104,7 @@ public enum Figure {
         return  turnRight().turnRight().turnRight();
     }
     public static Figure getRandom(){
-        switch((int)Math.random() * 7){
+        switch((int)(Math.random() * 7)){
             case 0: return I1;
             case 1: return J1;
             case 2: return L1;
