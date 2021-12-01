@@ -21,6 +21,8 @@ public class Window extends JFrame implements Runnable, Mapable {
     private int count = 0;
     private JLabel status;
     private Timer timer;
+    private boolean isStarted = false;
+
 
     JLabel getStatusBar() {
         return statusBar;
@@ -39,7 +41,7 @@ public class Window extends JFrame implements Runnable, Mapable {
         add(status, BorderLayout.SOUTH);
         addKeyListener(new KeyAdapter());
         TimeAdapter timeAdapter = new TimeAdapter();
-        timer = new Timer(100, timeAdapter);
+        timer = new Timer(150, timeAdapter);
         timer.start();
     }
     public void addFigure(){
@@ -48,6 +50,7 @@ public class Window extends JFrame implements Runnable, Mapable {
             showFigure();
         }
         else{
+            isStarted = false;
             setStatusText(String.valueOf(count) + ". Игра окончена!");
             timer.stop();
             //setVisible(false);
@@ -72,6 +75,7 @@ public class Window extends JFrame implements Runnable, Mapable {
 
         setVisible(true);
         setResizable(false);
+        isStarted = true;
     }
 
     private void initBoxes(){
@@ -82,7 +86,9 @@ public class Window extends JFrame implements Runnable, Mapable {
             }
         }
     }
-
+    public boolean isStarted() {
+        return isStarted;
+    }
     public void setStatusText(String sc) {
         status.setText("Счет: " + sc);
     }
@@ -141,15 +147,20 @@ public class Window extends JFrame implements Runnable, Mapable {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            hideFigure();
-            switch (e.getKeyCode()){
-                case KeyEvent.VK_LEFT : moveFly(-1, 0); break;
-                case KeyEvent.VK_RIGHT : moveFly(+1 ,0); break;
-
-                case KeyEvent.VK_UP: turnFly(2); break;
-                //case KeyEvent.VK_DOWN: turnFly(1); break;
+            if(!isStarted){
+                return;
             }
-            showFigure();
+            else{
+                hideFigure();
+                switch (e.getKeyCode()){
+                    case KeyEvent.VK_LEFT : moveFly(-1, 0); break;
+                    case KeyEvent.VK_RIGHT : moveFly(+1 ,0); break;
+
+                    case KeyEvent.VK_UP: turnFly(2); break;
+                    case KeyEvent.VK_DOWN: moveFly(0, +6); break;
+                }
+                showFigure();
+            }
         }
 
         @Override
