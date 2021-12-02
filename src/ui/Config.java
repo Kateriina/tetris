@@ -7,7 +7,7 @@ public class Config {
     public static final int WIDTH = 10;
     public static final int HEIGHT = 20;
 
-    public static final int SIZE = 15;//35
+    public static final int SIZE = 35;//35
     public static final Color[] COLORS = {
             Color.lightGray,
             Color.GREEN,

@@ -22,6 +22,8 @@ public class Window extends JFrame implements Runnable, Mapable {
     private JLabel status;
     private Timer timer;
     private boolean isStarted = false;
+    private boolean isPaused = false;
+    private boolean isFinished = false;
 
 
     JLabel getStatusBar() {
@@ -49,6 +51,7 @@ public class Window extends JFrame implements Runnable, Mapable {
         }
         else{
             isStarted = false;
+            isFinished = true;
             setStatusText(String.valueOf(count) + ". Игра окончена!");
             timer.stop();
         }
@@ -72,6 +75,7 @@ public class Window extends JFrame implements Runnable, Mapable {
         setVisible(true);
         setResizable(false);
         isStarted = true;
+        isFinished = false;
     }
 
     public void initMenu(){
@@ -98,7 +102,15 @@ public class Window extends JFrame implements Runnable, Mapable {
         menuFile.add(itemNg);
         JMenuItem itemHs = new JMenuItem("High Scores");
         menuFile.add(itemHs);
-        JMenuItem itemAbout = new JMenuItem("About");
+        JMenuItem itemAbout = new JMenuItem(new AbstractAction("About") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pause();
+                ImageIcon icon = new ImageIcon("images/tetris.png");
+                JOptionPane.showMessageDialog(null, "Игра Тетрис\n\nВерсия: 1.0\n\nУправление:\n\nСтрелка влево - движение влево\nСтрелка вправо - движение вправо\nСтрелка вверх - поворот направо\nСтрелка вниз - ускорение падения фигуры\nПробел - пауза\n\n© by Kate","About", JOptionPane.INFORMATION_MESSAGE, icon);
+                pause();
+            }
+        });
         menuFile.add(itemAbout);
 
         menuBar.add(menuFile);
@@ -127,6 +139,29 @@ public class Window extends JFrame implements Runnable, Mapable {
     }
     public boolean isStarted() {
         return isStarted;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+    public boolean isFinished() { return isFinished; }
+
+    public void pause() {
+
+        if (isFinished){
+            return;
+        }
+        isPaused = !isPaused;
+        if (isPaused) {
+            isStarted = false;
+            timer.stop();
+            setStatusText("Пауза");
+        } else {
+            isStarted = true;
+            timer.start();
+            setStatusText(String.valueOf(count));
+        }
+        repaint();
     }
     public void setStatusText(String sc) {
         status.setText("Счет: " + sc);
@@ -186,6 +221,10 @@ public class Window extends JFrame implements Runnable, Mapable {
 
         @Override
         public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                pause();
+                return;
+            }
             if(!isStarted){
                 return;
             }
@@ -200,6 +239,8 @@ public class Window extends JFrame implements Runnable, Mapable {
                 }
                 showFigure();
             }
+
+
         }
 
         @Override
