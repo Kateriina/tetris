@@ -32,18 +32,16 @@ public class Window extends JFrame implements Runnable, Mapable {
         count = 0;
         initForm();
         initBoxes();
-        setLayout(new BorderLayout());
+        initMenu();
+        initScore();
 
-        status = new JLabel("");
-        setStatusText("0");
-        //JLabel status = new JLabel();
-        //status.setText("Score: "+ score);
-        add(status, BorderLayout.SOUTH);
         addKeyListener(new KeyAdapter());
         TimeAdapter timeAdapter = new TimeAdapter();
         timer = new Timer(150, timeAdapter);
         timer.start();
     }
+
+
     public void addFigure(){
         fly = new FlyFigure(this);
         if(fly.canPlaceFigure()){
@@ -53,8 +51,6 @@ public class Window extends JFrame implements Runnable, Mapable {
             isStarted = false;
             setStatusText(String.valueOf(count) + ". Игра окончена!");
             timer.stop();
-            //setVisible(false);
-            //dispose();
         }
     }
 
@@ -64,7 +60,7 @@ public class Window extends JFrame implements Runnable, Mapable {
         setIconImage(icon);
 
         setSize(Config.WIDTH * Config.SIZE + 15,
-                Config.HEIGHT * Config.SIZE + 65); // размер формы
+                Config.HEIGHT * Config.SIZE + 80); // размер формы
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -77,6 +73,49 @@ public class Window extends JFrame implements Runnable, Mapable {
         setResizable(false);
         isStarted = true;
     }
+
+    public void initMenu(){
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menuFile = new JMenu("File");
+        JMenuItem itemExit = new JMenuItem(new AbstractAction("Exit") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        menuFile.add(itemExit);
+
+        JMenuItem itemNg = new JMenuItem(new AbstractAction("New Game") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Window window = new Window();
+                SwingUtilities.invokeLater(window);
+                window.addFigure();
+            }
+        });
+        menuFile.add(itemNg);
+        JMenuItem itemHs = new JMenuItem("High Scores");
+        menuFile.add(itemHs);
+        JMenuItem itemAbout = new JMenuItem("About");
+        menuFile.add(itemAbout);
+
+        menuBar.add(menuFile);
+        setJMenuBar(menuBar);
+
+    }
+
+    public void initScore(){
+
+        setLayout(new BorderLayout());
+        status = new JLabel("");
+        setStatusText("0");
+        //JLabel status = new JLabel();
+        //status.setText("Score: "+ score);
+        add(status, BorderLayout.SOUTH);
+    }
+
 
     private void initBoxes(){
         for ( int x = 0; x < Config.WIDTH; x++){
