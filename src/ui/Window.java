@@ -1,7 +1,6 @@
 package ui;
 
 import model.Coordinates;
-import model.Figure;
 import model.Mapable;
 import service.FlyFigure;
 
@@ -11,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.*;
 
 public class Window extends JFrame implements Runnable, Mapable {
 
@@ -24,6 +24,7 @@ public class Window extends JFrame implements Runnable, Mapable {
     private boolean isStarted = false;
     private boolean isPaused = false;
     private boolean isFinished = false;
+    private String highscore = "0";
 
 
     JLabel getStatusBar() {
@@ -54,8 +55,13 @@ public class Window extends JFrame implements Runnable, Mapable {
             isFinished = true;
             setStatusText(String.valueOf(count) + ". Игра окончена!");
             timer.stop();
+
+            setHighScore();
         }
     }
+
+
+
 
     public void initForm(){
 
@@ -100,8 +106,29 @@ public class Window extends JFrame implements Runnable, Mapable {
             }
         });
         menuFile.add(itemNg);
-        JMenuItem itemHs = new JMenuItem("High Scores");
+
+        JMenuItem itemHs = new JMenuItem(new AbstractAction("High Scores") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pause();
+                getHighScore();
+                JOptionPane.showMessageDialog(null,"Рекорд: " + highscore);
+                pause();
+            }
+        });
         menuFile.add(itemHs);
+
+        menuFile.add(itemNg);
+        JMenuItem itemClear = new JMenuItem(new AbstractAction("Clear High Scores") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pause();
+                setClearScore();
+                pause();
+            }
+        });
+        menuFile.add(itemClear);
+
         JMenuItem itemAbout = new JMenuItem(new AbstractAction("About") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -111,8 +138,8 @@ public class Window extends JFrame implements Runnable, Mapable {
                 pause();
             }
         });
-        menuFile.add(itemAbout);
 
+        menuFile.add(itemAbout);
         menuBar.add(menuFile);
         setJMenuBar(menuBar);
 
@@ -290,6 +317,48 @@ public class Window extends JFrame implements Runnable, Mapable {
                 removeLines();
                 addFigure();
             }
+        }
+    }
+
+
+    public void getHighScore() {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader("highscore.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String line = null;
+        try {
+            highscore = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setHighScore(){
+        getHighScore();
+        if (Integer.parseInt(highscore) < count){
+            try (BufferedWriter writter = new BufferedWriter(new FileWriter("highscore.txt"))) {
+                writter.write(String.valueOf(count));
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void setClearScore(){
+        try (BufferedWriter writter = new BufferedWriter(new FileWriter("highscore.txt"))) {
+            writter.write("0");
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
